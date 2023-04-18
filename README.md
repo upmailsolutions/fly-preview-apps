@@ -8,19 +8,18 @@ If you have an existing `fly.toml` in your repo, this action will copy it with a
 
 ## Inputs
 
-| name      | description                                                                                                                                                                                   |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`    | The name of the Fly app. Alternatively, set the env `FLY_APP`. For safety, must include the PR number. Example: `myapp-pr-${{ github.event.number }}`. Defaults to `pr-{number}-{repo_name}`. |
-| `image`   | Optional pre-existing Docker image to use                                                                                                                                                     |
-| `config`  | Optional path to a custom Fly toml config. Config path should be relative to `path` parameter, if specified.                                                                                  |
-| `region`  | Which Fly region to run the app in. Alternatively, set the env `FLY_REGION`. Defaults to `iad`.                                                                                               |
-| `org`     | Which Fly organization to launch the app under. Alternatively, set the env `FLY_ORG`. Defaults to `personal`.                                                                                 |
-| `path`    | Path to run the `flyctl` commands from. Useful if you have an existing `fly.toml` in a subdirectory.                                                                                          |
-| `update`  | Whether or not to update this Fly app when the PR is updated. Default `true`.                                                                                                                 |
-| `secrets` | Runtime environment variables.                                                                                                                                                                 |
-| `vm`      | Changes the type of the VM. Defaults to shared-cpu-1x.
-| `vm_memory`| Adjusts VM's memory. Default to 256.
-
+| name        | description                                                                                                                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`      | The name of the Fly app. Alternatively, set the env `FLY_APP`. For safety, must include the PR number. Example: `myapp-pr-${{ github.event.number }}`. Defaults to `pr-{number}-{repo_name}`. |
+| `image`     | Optional pre-existing Docker image to use                                                                                                                                                     |
+| `config`    | Optional path to a custom Fly toml config. Config path should be relative to `path` parameter, if specified.                                                                                  |
+| `region`    | Which Fly region to run the app in. Alternatively, set the env `FLY_REGION`. Defaults to `iad`.                                                                                               |
+| `org`       | Which Fly organization to launch the app under. Alternatively, set the env `FLY_ORG`. Defaults to `personal`.                                                                                 |
+| `path`      | Path to run the `flyctl` commands from. Useful if you have an existing `fly.toml` in a subdirectory.                                                                                          |
+| `update`    | Whether or not to update this Fly app when the PR is updated. Default `true`.                                                                                                                 |
+| `secrets`   | Runtime environment variables.                                                                                                                                                                |
+| `vm`        | Changes the type of the VM. Defaults to shared-cpu-1x.                                                                                                                                        |
+| `vm_memory` | Adjusts VM's memory. Default to 256.                                                                                                                                                          |
 
 ## Required Secrets
 
@@ -54,11 +53,11 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Deploy
         id: deploy
-        uses: amos-kibet/fly-pr-review-apps@v1
+        uses: optimumBA/fly-preview-apps@main
 ```
 
 ## With Secrets
@@ -66,7 +65,7 @@ jobs:
 ```YAML
       - name: Deploy
         id: deploy
-        uses: amos-kibet/fly-pr-review-apps@v1
+        uses: optimumBA/fly-preview-apps@main
         with:
           name: pr-${{ github.event.number }}-${{ env.REPO_NAME }}
           secrets: 'SECRET_1=${{ secrets.SECRET_1 }} SECRET_2=${{ secrets.SECRET_2 }}'
@@ -93,11 +92,11 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Deploy app
         id: deploy
-        uses: amos-kibet/fly-pr-review-apps@v1
+        uses: optimumBA/fly-preview-apps@main
 
       - name: Clean up GitHub environment
         uses: strumwolf/delete-deployment-environment@v1
@@ -116,10 +115,10 @@ Redis example:
 
 ```yaml
 steps:
-  - uses: actions/checkout@v1
+  - uses: actions/checkout@v3
 
   - name: Deploy redis
-    uses: amos-kibet/fly-pr-review-apps@v1
+    uses: optimumBA/fly-preview-apps@main
     with:
       update: false # Don't need to re-deploy redis when the PR is updated
       path: redis # Keep fly.toml in a subdirectory to avoid confusing flyctl
@@ -128,7 +127,7 @@ steps:
 
   - name: Deploy app
     id: deploy
-    uses: amos-kibet/fly-pr-review-apps@v1
+    uses: optimumBA/fly-preview-apps@main
     with:
       name: pr-${{ github.event.number }}-myapp-app
 ```
