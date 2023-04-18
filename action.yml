@@ -1,5 +1,5 @@
-name: "PR Review Apps on fly.io"
-description: "Deploy temporary apps from pull requests on Fly.io"
+name: "Pull Request Review Apps on Fly.io"
+description: "Deploy and Destroy Pull Request Review Phoenix Apps on Fly.io. Resources like databases and volumes are also created, if needed, and destroyed"
 author: Fly
 branding:
   icon: "upload-cloud"
@@ -13,17 +13,19 @@ inputs:
   image:
     description: Optional pre-existing Docker image to use
   config:
-    description: Optional path to a custom Fly toml config. Config path should be relative to `path` parameter, if specified.
+    description: App's config file (fly.toml).
   region:
     description: Region to launch the app in (alternatively, set the env FLY_REGION)
   org:
     description: Organization to launch the app in (alternatively, set the env FLY_ORG)
   path:
-    description: path to a directory containing a fly.toml to clone
-  postgres:
-    description: Optionally attach the app to a pre-existing Postgres cluster on Fly
+    description: Path to a directory containing a fly.toml to clone. Defaults to root path.
   update:
-    description: Whether new commits to the PR should re-deploy the Fly app
+    description: Whether new commits to the PR should re-deploy the Fly app. Defaults to true.
     default: true
   secrets:
-    description: Secrets to be set on the app. Separate multiple secrets with a space, i.e., `FIRST_SECRET=${{ secrets.FIRST_SECRET }} SECOND_SECRET=${{ secrets.SECOND_SECRET }}`
+    description: Secrets to be set on the app. Separate multiple secrets with a space.
+  vm:
+    description: Changes the type of the VM. Defaults to shared-cpu-1x.
+  vm_memory:
+    description: Adjusts VM's memory. Default to 256.
