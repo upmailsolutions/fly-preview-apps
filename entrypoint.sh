@@ -26,6 +26,7 @@ IMAGE="$INPUT_IMAGE"
 CONFIG="${INPUT_CONFIG:-fly.toml}"
 VM="${INPUT_VM:-shared-cpu-1x}"
 VM_MEMORY="${INPUT_VM_MEMORY:-256}"
+HA="${INPUT_HA:-false}"
 
 # replace any dash with underscore in app name
 # fly.io does not accept dashes in volume names
@@ -102,7 +103,7 @@ if [ -n "$INPUT_SECRETS" ]; then
 fi
 
 # Deploy the app.
-flyctl deploy --config "$CONFIG" --app "$APP" --region "$REGION" --remote-only --strategy immediate --vm-memory "$VM_MEMORY" --vm-size "$VM"
+flyctl deploy --config "$CONFIG" --app "$APP" --region "$REGION" --remote-only --strategy immediate --vm-memory "$VM_MEMORY" --vm-size "$VM" --ha="$HA"
 
 # Make some info available to the GitHub workflow.
 flyctl status --app "$APP" --json >status.json

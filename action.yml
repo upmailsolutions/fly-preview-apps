@@ -29,3 +29,5 @@ inputs:
     description: Changes the type of the VM. Defaults to shared-cpu-1x.
   vm_memory:
     description: Adjusts VM's memory. Default to 256.
+  ha:
+    description: Whether to enable high availability by creating a spare machine. Defaults to false.
