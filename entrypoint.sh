@@ -64,7 +64,6 @@ fi
 # if not, launch it, but don't deploy yet
 if ! flyctl status --app "$APP"; then
   flyctl apps create "$APP" --org "$ORG"
-  flyctl regions set "$REGION" --app "$APP" -y
 
   # look for "migrate" file in the app files
   # if it exists, the app probably needs DB.
