@@ -19,15 +19,22 @@ inputs:
   org:
     description: Organization to launch the app in (alternatively, set the env FLY_ORG)
   path:
-    description: Path to a directory containing a fly.toml to clone. Defaults to root path.
-  update:
-    description: Whether new commits to the PR should re-deploy the Fly app. Defaults to true.
-    default: true
+    description: path to a directory containing a fly.toml to clone
+  postgres:
+    description: Optionally attach the app to a pre-existing Postgres cluster on Fly
   secrets:
-    description: Secrets to be set on the app. Separate multiple secrets with a space.
-  vm:
-    description: Changes the type of the VM. Defaults to shared-cpu-1x.
-  vm_memory:
-    description: Adjusts VM's memory. Default to 256.
+    description: Secrets to be set on the app. Separate multiple secrets with a space
+  vmsize:
+    description: Set app VM to a named size, eg. shared-cpu-1x, dedicated-cpu-1x, dedicated-cpu-2x etc. Takes precedence over cpu, cpu kind, and memory inputs.
+  cpu:
+    description: Set app VM CPU (defaults to 1 cpu)
+    default: 1
+  cpukind:
+    description: Set app VM CPU kind - shared or performance. (defaults to shared)
+    default: shared
+  memory:
+    description: Set app VM memory in megabytes (defaults to 256 megabytes)
+    default: 256
   ha:
-    description: Whether to enable high availability by creating a spare machine. Defaults to false.
+    description: Create spare machines that increases app availability (default false)
+    default: false

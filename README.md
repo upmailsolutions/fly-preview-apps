@@ -8,18 +8,22 @@ If you have an existing `fly.toml` in your repo, this action will copy it with a
 
 ## Inputs
 
-| name        | description                                                                                                                                                                                   |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`      | The name of the Fly app. Alternatively, set the env `FLY_APP`. For safety, must include the PR number. Example: `myapp-pr-${{ github.event.number }}`. Defaults to `pr-{number}-{repo_name}`. |
-| `image`     | Optional pre-existing Docker image to use                                                                                                                                                     |
-| `config`    | Optional path to a custom Fly toml config. Config path should be relative to `path` parameter, if specified.                                                                                  |
-| `region`    | Which Fly region to run the app in. Alternatively, set the env `FLY_REGION`. Defaults to `iad`.                                                                                               |
-| `org`       | Which Fly organization to launch the app under. Alternatively, set the env `FLY_ORG`. Defaults to `personal`.                                                                                 |
-| `path`      | Path to run the `flyctl` commands from. Useful if you have an existing `fly.toml` in a subdirectory.                                                                                          |
-| `update`    | Whether or not to update this Fly app when the PR is updated. Default `true`.                                                                                                                 |
-| `secrets`   | Runtime environment variables.                                                                                                                                                                |
-| `vm`        | Changes the type of the VM. Defaults to shared-cpu-1x.                                                                                                                                        |
-| `vm_memory` | Adjusts VM's memory. Default to 256.                                                                                                                                                          |
+| name       | description                                                                                                                                                                                              |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`     | The name of the Fly app. Alternatively, set the env `FLY_APP`. For safety, must include the PR number. Example: `myapp-pr-${{ github.event.number }}`. Defaults to `pr-{number}-{repo_org}-{repo_name}`. |
+| `image`    | Optional pre-existing Docker image to use                                                                                                                                                                |
+| `config`   | Optional path to a custom Fly toml config. Config path should be relative to `path` parameter, if specified.                                                                                             |
+| `region`   | Which Fly region to run the app in. Alternatively, set the env `FLY_REGION`. Defaults to `iad`.                                                                                                          |
+| `org`      | Which Fly organization to launch the app under. Alternatively, set the env `FLY_ORG`. Defaults to `personal`.                                                                                            |
+| `path`     | Path to run the `flyctl` commands from. Useful if you have an existing `fly.toml` in a subdirectory.                                                                                                     |
+| `postgres` | Optional name of an existing Postgres cluster to `flyctl postgres attach` to.                                                                                                                            |
+| `update`   | Whether or not to update this Fly app when the PR is updated. Default `true`.                                                                                                                            |
+| `secrets`  | Secrets to be set on the app. Separate multiple secrets with a space                                                                                                                                     |
+| `vmsize`   | Set app VM to a named size, eg. shared-cpu-1x, dedicated-cpu-1x, dedicated-cpu-2x etc. Takes precedence over cpu, cpu kind, and memory inputs.                                                           |
+| `cpu`      | Set app VM CPU (defaults to 1 cpu). Default 1.                                                                                                                                                           |
+| `cpukind`  | Set app VM CPU kind - shared or performance. Default shared.                                                                                                                                             |
+| `memory`   | Set app VM memory in megabytes. Default 256.                                                                                                                                                             |
+| `ha`       | Create spare machines that increases app availability. Default `false`.                                                                                                                                  |
 
 ## Required Secrets
 
@@ -53,7 +57,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Deploy
         id: deploy
@@ -92,7 +96,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Deploy app
         id: deploy
@@ -107,6 +111,24 @@ jobs:
           environment: pr-${{ github.event.number }}
 ```
 
+## Example with Postgres cluster
+
+If you have an existing [Fly Postgres cluster](https://fly.io/docs/reference/postgres/) you can attach it using the `postgres` action input. `flyctl postgres attach` will be used, which automatically creates a new database in the cluster named after the Fly app and sets `DATABASE_URL`.
+
+For production apps, it's a good idea to create a new Postgres cluster specifically for staging apps.
+
+```yaml
+# ...
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Deploy app
+    id: deploy
+    uses: superfly/fly-pr-review-apps@1.0.0
+    with:
+      postgres: myapp-postgres-staging-apps
+```
+
 ## Example with multiple Fly apps
 
 If you need to run multiple Fly apps per staging app, for example Redis, memcached, etc, just give each app a unique name. Your application code will need to be able to discover the app hostnames.
@@ -115,7 +137,7 @@ Redis example:
 
 ```yaml
 steps:
-  - uses: actions/checkout@v3
+  - uses: actions/checkout@v4
 
   - name: Deploy redis
     uses: optimumBA/fly-preview-apps@main
