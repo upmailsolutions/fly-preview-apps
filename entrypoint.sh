@@ -34,20 +34,6 @@ fi
 
 # PR was closed - remove the Fly app if one exists and exit.
 if [ "$EVENT_TYPE" = "closed" ]; then
-  # destroy app DB
-  if flyctl status --app "$app_db"; then
-    flyctl apps destroy "$app_db" -y || true
-  fi
-
-  # destroy associated volumes as well
-  # @TODO: refactor code below to avoid repeatedly running `flyctl volumes list ...`
-  # we could declare the variable in line 49 outside the if block, then reuse it inside the block,
-  # but in the case where VOLUME_ID is an empty string (no volume), GitHub action runner throws an error
-  if flyctl volumes list --app "$app" | grep -oh "\w*vol_\w*"; then
-    volume_id=$(flyctl volumes list --app "$APP" | grep -oh "\w*vol_\w*")
-    flyctl volumes destroy "$volume_id" -y || true
-  fi
-
   # finally, destroy the app
   if flyctl status --app "$app"; then
     flyctl apps destroy "$app" -y || true
@@ -84,21 +70,6 @@ if [ -e "rel/overlays/bin/migrate" ]; then
       fi
     fi
   fi
-fi
-
-# find a way to determine if the app requires volumes
-# basically, scan the config file if it contains "[mounts]", then create a volume for it
-if grep -q "\[mounts\]" "$config"; then
-  # replace any dash with underscore in app name
-  # fly.io does not accept dashes in volume names
-  volume="${app//-/_}"
-
-  # create volume only if none exists
-  if ! flyctl volumes list --app "$app" | grep -oh "\w*vol_\w*"; then
-    flyctl volumes create "$volume" --app "$app" --region "$region" --size 1 -y
-  fi
-  # modify config file to have the volume name specified above.
-  sed -i -e 's/source =.*/source = '\"$volume\"'/' "$config"
 fi
 
 # Import any required secrets
